@@ -1,0 +1,33 @@
+# Analysis options for the shared package
+# This file configures the analyzer, which statically analyzes Dart code to
+# check for errors, warnings, and lints.
+
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Enable additional rules for better code quality
+    always_declare_return_types: true
+    always_specify_types: true
+    avoid_dynamic_calls: true
+    prefer_final_fields: true
+    prefer_final_locals: true
+    prefer_final_in_for_each: true
+    require_trailing_commas: true
+    sort_constructors_first: true
+    sort_unnamed_constructors_first: true
+    type_annotate_public_apis: true
+    unawaited_futures: true
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  
+  errors:
+    # Treat missing return types as errors
+    always_declare_return_types: error
+    always_specify_types: error
+    
+    # Treat dynamic calls as warnings
+    avoid_dynamic_calls: warning
