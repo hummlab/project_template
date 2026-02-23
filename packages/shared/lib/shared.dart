@@ -6,4 +6,5 @@
 // Export all public APIs
 export 'src/models/models.dart';
 export 'src/data_providers/data_providers.dart';
-export 'src/repositories/repositories.dart';
+export 'src/data_repositories/data_repositories.dart';
+
