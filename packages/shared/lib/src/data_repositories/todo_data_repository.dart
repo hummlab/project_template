@@ -1,29 +1,60 @@
-import '../data_providers/todo_data_provider.dart';
 import '../models/todo_model.dart';
 import 'data_manager.dart';
 
 class NoFetchingParams {}
 
 class TodoDataRepository extends DataManager<TodoModel, NoFetchingParams> {
-  TodoDataRepository(this._dataProvider);
+  TodoDataRepository();
 
-  final TodoDataProvider _dataProvider;
+  int _nextId = 1;
 
   @override
   Future<Map<String, TodoModel>> fetch(NoFetchingParams params) async {
-    try {
-      final List<Map<String, dynamic>> rawData = await _dataProvider.fetchTodos();
-      final Map<String, TodoModel> result = <String, TodoModel>{};
+    // For local-only storage, fetch simply resolves to the currently cached data
+    // DataManager.initializeCache() loads it first, so we just return it here
+    // or return empty if nothing yet.
+    return data.value;
+  }
 
-      for (final Map<String, dynamic> item in rawData) {
-        final TodoModel todo = TodoModel.fromJson(item);
-        result[todo.id.toString()] = todo;
-      }
+  Future<void> addTodo(String title) async {
+    final Map<String, TodoModel> currentData = Map<String, TodoModel>.from(data.value);
 
-      return result;
-    } catch (e) {
-      throw Exception('Failed to load todos: $e');
+    // Find highest ID to auto-increment
+    if (currentData.isNotEmpty) {
+      final int maxId = currentData.values.map((TodoModel t) => t.id).reduce((int a, int b) => a > b ? a : b);
+      _nextId = maxId + 1;
     }
+
+    final TodoModel newTodo = TodoModel(id: _nextId, title: title, completed: false);
+
+    await updateStreamWith(<String, TodoModel?>{newTodo.id.toString(): newTodo});
+  }
+
+  Future<void> toggleTodo(int id) async {
+    final Map<String, TodoModel> currentData = data.value;
+    final String key = id.toString();
+
+    if (currentData.containsKey(key)) {
+      final TodoModel todo = currentData[key]!;
+      final TodoModel updatedTodo = todo.copyWith(completed: !todo.completed);
+      await updateStreamWith(<String, TodoModel?>{key: updatedTodo});
+    }
+  }
+
+  Future<void> editTodo(int id, String newTitle) async {
+    final Map<String, TodoModel> currentData = data.value;
+    final String key = id.toString();
+
+    if (currentData.containsKey(key)) {
+      final TodoModel todo = currentData[key]!;
+      final TodoModel updatedTodo = todo.copyWith(title: newTitle);
+      await updateStreamWith(<String, TodoModel?>{key: updatedTodo});
+    }
+  }
+
+  Future<void> deleteTodo(int id) async {
+    final String key = id.toString();
+    await updateStreamWith(<String, TodoModel?>{key: null}); // Passing null deletes the item
   }
 
   @override

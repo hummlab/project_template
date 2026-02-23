@@ -5,7 +5,6 @@
 
 // Export all data provider files here as they are created
 export 'api_provider.dart';
-export 'todo_data_provider.dart';
 
 // Additional data providers will be exported here
 // Example:

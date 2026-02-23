@@ -6,6 +6,7 @@
 // Export all model files here as they are created
 export 'user_model.dart';
 export 'todo_model.dart';
+export 'auth_response.dart';
 
 // Additional models will be exported here
 // Example:
